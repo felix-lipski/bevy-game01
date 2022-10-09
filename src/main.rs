@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy::input::mouse::MouseMotion;
+use bevy_rapier3d::prelude::*;
 
 fn main() {
     App::new()
@@ -9,8 +10,11 @@ fn main() {
         .add_startup_system(setup)
         .add_startup_system(lock_pointer)
         .add_system(player_movement)
+        .add_system(player_jump)
         .add_system(player_head_rotate)
         .add_system(player_body_rotate)
+        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
+        .add_plugin(RapierDebugRenderPlugin::default())
         .run();
 }
 
@@ -20,43 +24,47 @@ struct PlayerBody;
 #[derive(Component)]
 struct PlayerHead;
 
-#[derive(Component)]
-struct Position(Vec3);
-
 fn player_movement(
-    time: Res<Time>,
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(&PlayerBody, &mut Transform)>,
+    mut query: Query<(&PlayerBody, &Transform, &mut Velocity)>,
 ) {
-    let velo_f = 2.0;
-    for (_, mut transform) in query.iter_mut() {
-        if keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up) {
-            let frw = transform.forward().reject_from(Vec3::Y).normalize() * time.delta_seconds() * velo_f;
-            transform.translation += frw;
+    let velo_f = 8.0;
+    for (_, transform, mut vel) in query.iter_mut() {
+        let mut linear_vel = Vec3::ZERO;
+        if keyboard_input.pressed(KeyCode::W) {
+            linear_vel += transform.forward();
         }
-        if keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down) {
-            let frw = transform.back().reject_from(Vec3::Y).normalize() * time.delta_seconds() * velo_f;
-            transform.translation += frw;
+        if keyboard_input.pressed(KeyCode::S) {
+            linear_vel += transform.back();
         }
-        if keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left) {
-            let frw = transform.left() * time.delta_seconds() * velo_f;
-            transform.translation += frw;
+        if keyboard_input.pressed(KeyCode::A) {
+            linear_vel += transform.left();
         }
-        if keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right) {
-            let frw = transform.right() * time.delta_seconds() * velo_f;
-            transform.translation += frw;
+        if keyboard_input.pressed(KeyCode::D) {
+            linear_vel += transform.right();
         }
-        if keyboard_input.pressed(KeyCode::LShift) || keyboard_input.pressed(KeyCode::LShift) {
-            transform.translation.y += time.delta_seconds() * velo_f;
-        }
-        if keyboard_input.pressed(KeyCode::LControl) || keyboard_input.pressed(KeyCode::LControl) {
-            transform.translation.y -= time.delta_seconds() * velo_f;
-        }
-        if keyboard_input.pressed(KeyCode::E) || keyboard_input.pressed(KeyCode::E) {
-            transform.rotate_y(-time.delta_seconds());
-        }
-        if keyboard_input.pressed(KeyCode::Q) || keyboard_input.pressed(KeyCode::Q) {
-            transform.rotate_y(time.delta_seconds());
+        linear_vel = linear_vel.normalize_or_zero() * velo_f;
+        vel.linvel.x = linear_vel.x;
+        vel.linvel.z = linear_vel.z;
+    }
+}
+
+fn player_jump(
+    keyboard_input: Res<Input<KeyCode>>,
+    rapier_context: Res<RapierContext>,
+    mut query: Query<(Entity, &PlayerBody, &Transform, &mut Velocity)>,
+) {
+    for (ent, _, transform, mut vel) in query.iter_mut() {
+        if let Some((_, _)) = rapier_context.cast_ray(
+            transform.translation,
+            transform.down(),
+            2.0,
+            true,
+            QueryFilter::new().exclude_collider(ent)
+        ) {
+            if keyboard_input.pressed(KeyCode::Space) {
+                vel.linvel.y = 3.0;
+            }
         }
     }
 }
@@ -77,8 +85,7 @@ fn player_body_rotate(
 ) {
     let mut rotation_x = 0f32;
     for mouse_motion_event in mouse_motion_events.iter() {
-        let delta_x = mouse_motion_event.delta.x;
-        rotation_x += delta_x;
+        rotation_x += mouse_motion_event.delta.x;
     }
     for (_, mut transform) in query.iter_mut() {
         transform.rotate_y(rotation_x * -0.005);
@@ -107,31 +114,64 @@ fn setup(
 ) {
     commands
         .spawn_bundle(PbrBundle {
-            material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
-            transform: Transform::from_xyz(0.0, 0.0, 3.0),
+            transform: Transform::from_xyz(0.0, 1.0, 3.0),
             ..default()
         })
         .insert(PlayerBody)
+        .insert(Velocity {
+            linvel: Vec3::new(0.0, 0.0, 0.0),
+            angvel: Vec3::new(0.0, 0.0, 0.0),
+        })
+        .insert(LockedAxes::ROTATION_LOCKED)
+        .insert(RigidBody::Dynamic)
+        .insert(Collider::capsule_y(0.7, 0.25))
         .with_children(|parent| {
-            parent.spawn_bundle(Camera3dBundle {
-                transform: Transform::from_xyz(0.0, 1.0, 0.0),
-                ..default()
-            })
-            .insert(PlayerHead);
-
+            parent
+                .spawn_bundle(Camera3dBundle {
+                    // transform: Transform::from_xyz(0.0, 3.0, 4.0),
+                    transform: Transform::from_xyz(0.0, 1.0, 0.0),
+                    ..default()
+                })
+                .insert(PlayerHead);
         });
 
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
-        material: materials.add(Color::hsl(77.0, 1.0, 0.66).into()),
-        ..default()
-    });
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-        material: materials.add(Color::hsl(216.0, 1.0, 0.5).into()),
-        transform: Transform::from_xyz(0.0, 0.5, 0.0),
-        ..default()
-    });
+    commands
+        .spawn_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Plane { size: 10.0 })),
+            material: materials.add(Color::hsl(77.0, 1.0, 0.66).into()),
+            ..default()
+        })
+        .insert(RigidBody::Fixed)
+        .insert(Collider::cuboid(5.0, 0.01, 5.0));
+    commands
+        .spawn_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+            material: materials.add(Color::hsl(77.0, 1.0, 0.5).into()),
+            transform: Transform::from_xyz(-2.0, 0.5, 0.0),
+            ..default()
+        })
+        .insert(RigidBody::Fixed)
+        .insert(Collider::cuboid(0.5, 0.5, 0.5));
+
+
+    commands
+        .spawn_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+            material: materials.add(Color::hsl(216.0, 1.0, 0.5).into()),
+            transform: Transform::from_xyz(0.0, 0.5, 0.0),
+            ..default()
+        })
+        .insert(RigidBody::Dynamic)
+        .insert(Collider::cuboid(0.5, 0.5, 0.5));
+    commands
+        .spawn_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+            material: materials.add(Color::hsl(216.0, 1.0, 0.5).into()),
+            transform: Transform::from_xyz(0.7, 2.5, 0.6),
+            ..default()
+        })
+        .insert(RigidBody::Dynamic)
+        .insert(Collider::cuboid(0.5, 0.5, 0.5));
     commands.spawn_bundle(PointLightBundle {
         point_light: PointLight {
             intensity: 1500.0,
