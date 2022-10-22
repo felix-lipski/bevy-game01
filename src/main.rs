@@ -1,4 +1,15 @@
-use bevy::prelude::*;
+use bevy::{
+    pbr::{MaterialPipeline, MaterialPipelineKey},
+    prelude::*,
+    reflect::TypeUuid,
+    render::{
+        mesh::MeshVertexBufferLayout,
+        render_resource::{
+            AsBindGroup, RenderPipelineDescriptor, ShaderRef, SpecializedMeshPipelineError, SamplerDescriptor, FilterMode
+        },
+        texture::ImageSettings
+    },
+};
 use bevy::input::mouse::MouseMotion;
 use bevy_rapier3d::prelude::*;
 
@@ -6,7 +17,15 @@ fn main() {
     App::new()
         .insert_resource(ClearColor(Color::hsl(160.0, 0.0, 0.07)))
         .insert_resource(Msaa { samples: 1 })
+        .insert_resource(ImageSettings { default_sampler: SamplerDescriptor {
+            label: Some("Present Sampler"),
+            mag_filter: FilterMode::Nearest,
+            min_filter: FilterMode::Nearest,
+            mipmap_filter: FilterMode::Nearest,
+            ..Default::default()}
+        })
         .add_plugins(DefaultPlugins)
+        .add_plugin(MaterialPlugin::<CustomMaterial>::default())
         .add_startup_system(setup)
         .add_startup_system(lock_pointer)
         .add_system(player_movement)
@@ -111,6 +130,8 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut custom_materials: ResMut<Assets<CustomMaterial>>,
+    asset_server: Res<AssetServer>,
 ) {
     commands
         .spawn_bundle(PbrBundle {
@@ -155,14 +176,34 @@ fn setup(
 
 
     commands
-        .spawn_bundle(PbrBundle {
+        .spawn_bundle(MaterialMeshBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: materials.add(Color::hsl(216.0, 1.0, 0.5).into()),
+            // material: materials.add(Color::hsl(216.0, 1.0, 0.5).into()),
+            material: custom_materials.add(CustomMaterial {
+                color: Color::BLUE,
+                color_texture: Some(asset_server.load("textures/regions.png")),
+                alpha_mode: AlphaMode::Blend,
+            }),
             transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()
         })
         .insert(RigidBody::Dynamic)
         .insert(Collider::cuboid(0.5, 0.5, 0.5));
+    commands
+        .spawn_bundle(MaterialMeshBundle {
+            mesh: meshes.add(Mesh::from(shape::UVSphere { radius: 1.0, sectors: 16, stacks: 8 })),
+            // material: materials.add(Color::hsl(216.0, 1.0, 0.5).into()),
+            material: custom_materials.add(CustomMaterial {
+                color: Color::BLUE,
+                color_texture: Some(asset_server.load("textures/regions.png")),
+                alpha_mode: AlphaMode::Blend,
+            }),
+            transform: Transform::from_xyz(4.0, 1.5, 0.0),
+            ..default()
+        })
+        .insert(RigidBody::Dynamic)
+        .insert(Collider::ball(1.0));
+
     commands
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
@@ -181,4 +222,49 @@ fn setup(
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..default()
     });
+}
+
+
+
+// This is the struct that will be passed to your shader
+#[derive(AsBindGroup, Clone, TypeUuid)]
+#[uuid = "4ee9c363-1124-4113-890e-199d81b00281"]
+pub struct CustomMaterial {
+    #[uniform(0)]
+    color: Color,
+    #[texture(1)]
+    #[sampler(2)]
+    color_texture: Option<Handle<Image>>,
+    alpha_mode: AlphaMode,
+}
+
+/// The Material trait is very configurable, but comes with sensible defaults for all methods.
+/// You only need to implement functions for features that need non-default behavior. See the Material api docs for details!
+/// When using the GLSL shading language for your shader, the specialize method must be overriden.
+impl Material for CustomMaterial {
+    fn vertex_shader() -> ShaderRef {
+        "shaders/mask.vert".into()
+    }
+
+    fn fragment_shader() -> ShaderRef {
+        "shaders/mask.frag".into()
+    }
+
+    fn alpha_mode(&self) -> AlphaMode {
+        self.alpha_mode
+    }
+
+    // Bevy assumes by default that vertex shaders use the "vertex" entry point
+    // and fragment shaders use the "fragment" entry point (for WGSL shaders).
+    // GLSL uses "main" as the entry point, so we must override the defaults here
+    fn specialize(
+        _pipeline: &MaterialPipeline<Self>,
+        descriptor: &mut RenderPipelineDescriptor,
+        _layout: &MeshVertexBufferLayout,
+        _key: MaterialPipelineKey<Self>,
+    ) -> Result<(), SpecializedMeshPipelineError> {
+        descriptor.vertex.entry_point = "main".into();
+        descriptor.fragment.as_mut().unwrap().entry_point = "main".into();
+        Ok(())
+    }
 }
