@@ -1,0 +1,49 @@
+digraph "RenderGraph" {
+	"rankdir"="LR";
+	"ranksep"="1.0";
+	graph ["bgcolor"="#35393F"];
+	edge ["fontname"="Helvetica", "fontcolor"="white"];
+	node ["shape"="plaintext", "fontname"="Helvetica", "fontcolor"="white"];
+	subgraph "cluster_core_2d" {
+		"label"="core_2d";
+		graph ["style"="rounded,filled", "color"="#5e6570", "fontcolor"="black"];
+		subgraph "cluster_core_2d_draw_ui" {
+			"label"="draw_ui";
+			graph ["style"="rounded,filled", "color"="#6a83aa", "fontcolor"="black"];
+			"_core_2d_draw_ui__core_2d_draw_uiGraphInputNode" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">GraphInputNode<BR/><FONT COLOR="red" POINT-SIZE="10">GraphInputNode</FONT></TD></TR><TR><TD PORT="in-0">view_entity: Entity</TD><TD PORT="out-0">view_entity: Entity</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+			"_core_2d_draw_ui__core_2d_draw_uiui_pass" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">ui_pass<BR/><FONT COLOR="red" POINT-SIZE="10">UiPassNode</FONT></TD></TR><TR><TD PORT="in-0">view: Entity</TD><TD BORDER="0">&nbsp;</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+			"_core_2d_draw_ui__core_2d_draw_uiGraphInputNode":"out-0:e" -> "_core_2d_draw_ui__core_2d_draw_uiui_pass":"in-0:w" ["color"="white"]
+		}
+		
+		"_core_2d__core_2dmain_pass" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">main_pass<BR/><FONT COLOR="red" POINT-SIZE="10">MainPass2dNode</FONT></TD></TR><TR><TD PORT="in-0">view: Entity</TD><TD BORDER="0">&nbsp;</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+		"_core_2d__core_2dGraphInputNode" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">GraphInputNode<BR/><FONT COLOR="red" POINT-SIZE="10">GraphInputNode</FONT></TD></TR><TR><TD PORT="in-0">view_entity: Entity</TD><TD PORT="out-0">view_entity: Entity</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+		"_core_2d__core_2dui_pass" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">ui_pass<BR/><FONT COLOR="red" POINT-SIZE="10">RunGraphOnViewNode</FONT></TD></TR><TR><TD PORT="in-0">view: Entity</TD><TD BORDER="0">&nbsp;</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+		"_core_2d__core_2dGraphInputNode":"out-0:e" -> "_core_2d__core_2dmain_pass":"in-0:w" ["color"="white"]
+		"_core_2d__core_2dmain_pass":"title:e" -> "_core_2d__core_2dui_pass":"title:w" ["color"="white"]
+		"_core_2d__core_2dGraphInputNode":"out-0:e" -> "_core_2d__core_2dui_pass":"in-0:w" ["color"="white"]
+	}
+	
+	subgraph "cluster_core_3d" {
+		"label"="core_3d";
+		graph ["style"="rounded,filled", "color"="#5e6570", "fontcolor"="black"];
+		subgraph "cluster_core_3d_draw_ui" {
+			"label"="draw_ui";
+			graph ["style"="rounded,filled", "color"="#6a83aa", "fontcolor"="black"];
+			"_core_3d_draw_ui__core_3d_draw_uiGraphInputNode" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">GraphInputNode<BR/><FONT COLOR="red" POINT-SIZE="10">GraphInputNode</FONT></TD></TR><TR><TD PORT="in-0">view_entity: Entity</TD><TD PORT="out-0">view_entity: Entity</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+			"_core_3d_draw_ui__core_3d_draw_uiui_pass" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">ui_pass<BR/><FONT COLOR="red" POINT-SIZE="10">UiPassNode</FONT></TD></TR><TR><TD PORT="in-0">view: Entity</TD><TD BORDER="0">&nbsp;</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+			"_core_3d_draw_ui__core_3d_draw_uiGraphInputNode":"out-0:e" -> "_core_3d_draw_ui__core_3d_draw_uiui_pass":"in-0:w" ["color"="white"]
+		}
+		
+		"_core_3d__core_3dmain_pass" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">main_pass<BR/><FONT COLOR="red" POINT-SIZE="10">MainPass3dNode</FONT></TD></TR><TR><TD PORT="in-0">view: Entity</TD><TD BORDER="0">&nbsp;</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+		"_core_3d__core_3dshadow_pass" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">shadow_pass<BR/><FONT COLOR="red" POINT-SIZE="10">ShadowPassNode</FONT></TD></TR><TR><TD PORT="in-0">view: Entity</TD><TD BORDER="0">&nbsp;</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+		"_core_3d__core_3dGraphInputNode" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">GraphInputNode<BR/><FONT COLOR="red" POINT-SIZE="10">GraphInputNode</FONT></TD></TR><TR><TD PORT="in-0">view_entity: Entity</TD><TD PORT="out-0">view_entity: Entity</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+		"_core_3d__core_3dui_pass" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">ui_pass<BR/><FONT COLOR="red" POINT-SIZE="10">RunGraphOnViewNode</FONT></TD></TR><TR><TD PORT="in-0">view: Entity</TD><TD BORDER="0">&nbsp;</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+		"_core_3d__core_3dGraphInputNode":"out-0:e" -> "_core_3d__core_3dmain_pass":"in-0:w" ["color"="white"]
+		"_core_3d__core_3dshadow_pass":"title:e" -> "_core_3d__core_3dmain_pass":"title:w" ["color"="white"]
+		"_core_3d__core_3dGraphInputNode":"out-0:e" -> "_core_3d__core_3dshadow_pass":"in-0:w" ["color"="white"]
+		"_core_3d__core_3dmain_pass":"title:e" -> "_core_3d__core_3dui_pass":"title:w" ["color"="white"]
+		"_core_3d__core_3dGraphInputNode":"out-0:e" -> "_core_3d__core_3dui_pass":"in-0:w" ["color"="white"]
+	}
+	
+	"_camera_driver" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">camera_driver<BR/><FONT COLOR="red" POINT-SIZE="10">CameraDriverNode</FONT></TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+}

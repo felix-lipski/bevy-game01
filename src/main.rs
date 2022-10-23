@@ -7,34 +7,40 @@ use bevy::{
         render_resource::{
             AsBindGroup, RenderPipelineDescriptor, ShaderRef, SpecializedMeshPipelineError, SamplerDescriptor, FilterMode
         },
-        texture::ImageSettings
+        texture::ImageSettings,
+        render_graph::RenderGraph
     },
 };
 use bevy::input::mouse::MouseMotion;
 use bevy_rapier3d::prelude::*;
+use bevy::log::LogPlugin;
 
 fn main() {
-    App::new()
-        .insert_resource(ClearColor(Color::hsl(160.0, 0.0, 0.07)))
-        .insert_resource(Msaa { samples: 1 })
-        .insert_resource(ImageSettings { default_sampler: SamplerDescriptor {
+    let mut app = App::new();
+    app.insert_resource(ClearColor(Color::hsl(160.0, 0.0, 0.07)));
+    app.insert_resource(Msaa { samples: 1 });
+    app.insert_resource(ImageSettings { default_sampler: SamplerDescriptor {
             label: Some("Present Sampler"),
             mag_filter: FilterMode::Nearest,
             min_filter: FilterMode::Nearest,
             mipmap_filter: FilterMode::Nearest,
             ..Default::default()}
-        })
-        .add_plugins(DefaultPlugins)
-        .add_plugin(MaterialPlugin::<CustomMaterial>::default())
-        .add_startup_system(setup)
-        .add_startup_system(lock_pointer)
-        .add_system(player_movement)
-        .add_system(player_jump)
-        .add_system(player_head_rotate)
-        .add_system(player_body_rotate)
-        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
-        .add_plugin(RapierDebugRenderPlugin::default())
-        .run();
+        });
+    // app.add_plugins(DefaultPlugins);
+    app.add_plugins_with(DefaultPlugins, |plugins| plugins.disable::<LogPlugin>());
+    app.add_plugin(MaterialPlugin::<DitheredMaterial>::default());
+    app.add_startup_system(setup);
+    app.add_startup_system(lock_pointer);
+    app.add_system(player_movement);
+    app.add_system(player_jump);
+    app.add_system(player_head_rotate);
+    app.add_system(player_body_rotate);
+    app.add_plugin(RapierPhysicsPlugin::<NoUserData>::default());
+    // app.add_plugin(RapierDebugRenderPlugin::default())
+    app.run();
+
+    let dot = bevy_mod_debugdump::get_render_graph(&mut app);
+    std::fs::write("render-graph.dot", dot).expect("Failed to write render-graph.dot");;
 }
 
 #[derive(Component)]
@@ -130,7 +136,7 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut custom_materials: ResMut<Assets<CustomMaterial>>,
+    mut custom_materials: ResMut<Assets<DitheredMaterial>>,
     asset_server: Res<AssetServer>,
 ) {
     commands
@@ -158,31 +164,18 @@ fn setup(
 
     commands
         .spawn_bundle(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Plane { size: 10.0 })),
-            material: materials.add(Color::hsl(77.0, 1.0, 0.66).into()),
+            mesh: meshes.add(Mesh::from(shape::Plane { size: 40.0 })),
+            material: materials.add(Color::hsl(77.0, 0.5, 0.66).into()),
             ..default()
         })
         .insert(RigidBody::Fixed)
-        .insert(Collider::cuboid(5.0, 0.01, 5.0));
-    commands
-        .spawn_bundle(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: materials.add(Color::hsl(77.0, 1.0, 0.5).into()),
-            transform: Transform::from_xyz(-2.0, 0.5, 0.0),
-            ..default()
-        })
-        .insert(RigidBody::Fixed)
-        .insert(Collider::cuboid(0.5, 0.5, 0.5));
-
+        .insert(Collider::cuboid(20.0, 0.01, 20.0));
 
     commands
         .spawn_bundle(MaterialMeshBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            // material: materials.add(Color::hsl(216.0, 1.0, 0.5).into()),
-            material: custom_materials.add(CustomMaterial {
-                color: Color::BLUE,
+            material: custom_materials.add(DitheredMaterial {
                 color_texture: Some(asset_server.load("textures/regions.png")),
-                alpha_mode: AlphaMode::Blend,
             }),
             transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()
@@ -191,80 +184,60 @@ fn setup(
         .insert(Collider::cuboid(0.5, 0.5, 0.5));
     commands
         .spawn_bundle(MaterialMeshBundle {
-            mesh: meshes.add(Mesh::from(shape::UVSphere { radius: 1.0, sectors: 16, stacks: 8 })),
-            // material: materials.add(Color::hsl(216.0, 1.0, 0.5).into()),
-            material: custom_materials.add(CustomMaterial {
-                color: Color::BLUE,
+            mesh: meshes.add(Mesh::from(shape::UVSphere { radius: 1.0, sectors: 32, stacks: 16 })),
+            material: custom_materials.add(DitheredMaterial {
                 color_texture: Some(asset_server.load("textures/regions.png")),
-                alpha_mode: AlphaMode::Blend,
             }),
-            transform: Transform::from_xyz(4.0, 1.5, 0.0),
+            transform: Transform::from_xyz(3.0, 1.5, 1.0),
             ..default()
         })
         .insert(RigidBody::Dynamic)
         .insert(Collider::ball(1.0));
-
     commands
-        .spawn_bundle(PbrBundle {
+        .spawn_bundle(MaterialMeshBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: materials.add(Color::hsl(216.0, 1.0, 0.5).into()),
+            material: custom_materials.add(DitheredMaterial {
+                color_texture: Some(asset_server.load("textures/regions.png")),
+            }),
             transform: Transform::from_xyz(0.7, 2.5, 0.6),
             ..default()
         })
         .insert(RigidBody::Dynamic)
         .insert(Collider::cuboid(0.5, 0.5, 0.5));
+
     commands.spawn_bundle(PointLightBundle {
         point_light: PointLight {
-            intensity: 1500.0,
+            intensity: 15000.0,
             shadows_enabled: true,
             ..default()
         },
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
+        transform: Transform::from_xyz(0.0, 10.0, 0.0),
         ..default()
+    });
+    commands.spawn_bundle(SceneBundle {
+        scene: asset_server.load("models/skyscraper.glb#Scene0"),
+        transform: Transform::from_xyz(-10.0, 0.0, -10.0),
+        ..Default::default()
     });
 }
 
 
-
-// This is the struct that will be passed to your shader
 #[derive(AsBindGroup, Clone, TypeUuid)]
 #[uuid = "4ee9c363-1124-4113-890e-199d81b00281"]
-pub struct CustomMaterial {
-    #[uniform(0)]
-    color: Color,
+pub struct DitheredMaterial {
     #[texture(1)]
     #[sampler(2)]
     color_texture: Option<Handle<Image>>,
-    alpha_mode: AlphaMode,
 }
-
-/// The Material trait is very configurable, but comes with sensible defaults for all methods.
-/// You only need to implement functions for features that need non-default behavior. See the Material api docs for details!
-/// When using the GLSL shading language for your shader, the specialize method must be overriden.
-impl Material for CustomMaterial {
-    fn vertex_shader() -> ShaderRef {
-        "shaders/mask.vert".into()
-    }
-
-    fn fragment_shader() -> ShaderRef {
-        "shaders/mask.frag".into()
-    }
-
-    fn alpha_mode(&self) -> AlphaMode {
-        self.alpha_mode
-    }
-
-    // Bevy assumes by default that vertex shaders use the "vertex" entry point
-    // and fragment shaders use the "fragment" entry point (for WGSL shaders).
-    // GLSL uses "main" as the entry point, so we must override the defaults here
-    fn specialize(
-        _pipeline: &MaterialPipeline<Self>,
-        descriptor: &mut RenderPipelineDescriptor,
-        _layout: &MeshVertexBufferLayout,
-        _key: MaterialPipelineKey<Self>,
+impl Material for DitheredMaterial {
+    fn vertex_shader() -> ShaderRef { "shaders/mask.vert".into() }
+    fn fragment_shader() -> ShaderRef { "shaders/mask.frag".into() }
+    fn specialize( _pipeline: &MaterialPipeline<Self>, descriptor: &mut RenderPipelineDescriptor,
+        _layout: &MeshVertexBufferLayout, _key: MaterialPipelineKey<Self>,
     ) -> Result<(), SpecializedMeshPipelineError> {
         descriptor.vertex.entry_point = "main".into();
         descriptor.fragment.as_mut().unwrap().entry_point = "main".into();
         Ok(())
     }
 }
+

@@ -25,6 +25,8 @@
               # libxkbcommon wayland # To use wayland feature
               vulkan-tools
 
+              graphviz
+
             ];
             shellHook = ''
               '' ;
