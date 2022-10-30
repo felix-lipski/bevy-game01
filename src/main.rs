@@ -2,8 +2,10 @@ mod movement;
 use movement::{MovementPlugin, PlayerHead, PlayerBody};
 mod dithered;
 use dithered::{DitheredMaterial};
+mod wireframe;
+use wireframe::{WireframeConfig, WireframePlugin};
 use bevy::{
-    pbr::wireframe::{WireframeConfig, WireframePlugin},
+    // pbr::wireframe::{WireframeConfig, WireframePlugin},
     prelude::*,
     render::{
         render_resource::{ SamplerDescriptor, FilterMode, },
