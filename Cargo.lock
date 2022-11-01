@@ -1472,6 +1472,7 @@ dependencies = [
  "bevy",
  "bevy_mod_debugdump",
  "bevy_rapier3d",
+ "radsort",
 ]
 
 [[package]]

@@ -4,10 +4,10 @@
 @group(1) @binding(0)
 var<uniform> mesh: Mesh;
 
-@group(1) @binding(1)
-var base_color_texture: texture_2d<f32>;
-@group(1) @binding(2)
-var base_color_sampler: sampler;
+//@group(1) @binding(1)
+//var base_color_texture: texture_2d<f32>;
+//@group(1) @binding(2)
+//var base_color_sampler: sampler;
 
 // NOTE: Bindings must come before functions that use them!
 #import bevy_pbr::mesh_functions

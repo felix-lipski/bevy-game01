@@ -1,9 +1,11 @@
+// mod material;
+// use material::MaterialPlugin;
 mod movement;
 use movement::{MovementPlugin, PlayerHead, PlayerBody};
 mod dithered;
 use dithered::{DitheredMaterial};
 mod wireframe;
-use wireframe::{WireframeConfig, WireframePlugin};
+use wireframe::WireframePlugin;
 use bevy::{
     // pbr::wireframe::{WireframeConfig, WireframePlugin},
     prelude::*,
@@ -11,6 +13,7 @@ use bevy::{
         render_resource::{ SamplerDescriptor, FilterMode, },
         texture::ImageSettings,
     },
+    // pbr::PbrPlugin,
 };
 use bevy_rapier3d::prelude::*;
 use bevy::log::LogPlugin;
@@ -25,10 +28,15 @@ fn main() {
             mipmap_filter: FilterMode::Nearest,
             ..Default::default()}
         });
-    app.add_plugins_with(DefaultPlugins, |plugins| plugins.disable::<LogPlugin>());
+    app.add_plugins_with(DefaultPlugins, |plugins| 
+        plugins.disable::<LogPlugin>()
+        // plugins.disable::<PbrPlugin>()
+    );
     app.add_plugin(MaterialPlugin::<DitheredMaterial>::default());
+    // app.add_plugin(material::MaterialPlugin::<DitheredMaterial>::default());
+    // app.add_plugin(material::MaterialPlugin::<StandardMaterial>::default());
     app.add_plugin(MovementPlugin);
-    app.add_plugin(WireframePlugin);
+    app.add_plugin(WireframePlugin::<StandardMaterial>::default());
     app.add_plugin(RapierPhysicsPlugin::<NoUserData>::default());
     app.add_startup_system(setup);
     app.run();
@@ -42,11 +50,8 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut custom_materials: ResMut<Assets<DitheredMaterial>>,
-    mut wireframe_config: ResMut<WireframeConfig>,
     asset_server: Res<AssetServer>,
 ) {
-    wireframe_config.global = true;
-
     commands
         .spawn_bundle(PbrBundle {
             transform: Transform::from_xyz(0.0, 1.0, 3.0),
@@ -89,28 +94,28 @@ fn setup(
         })
         .insert(RigidBody::Dynamic)
         .insert(Collider::cuboid(0.5, 0.5, 0.5));
-    commands
-        .spawn_bundle(MaterialMeshBundle {
-            mesh: meshes.add(Mesh::from(shape::UVSphere { radius: 1.0, sectors: 32, stacks: 16 })),
-            material: custom_materials.add(DitheredMaterial {
-                color_texture: Some(asset_server.load("textures/regions.png")),
-            }),
-            transform: Transform::from_xyz(3.0, 1.5, 1.0),
-            ..default()
-        })
-        .insert(RigidBody::Dynamic)
-        .insert(Collider::ball(1.0));
-    commands
-        .spawn_bundle(MaterialMeshBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: custom_materials.add(DitheredMaterial {
-                color_texture: Some(asset_server.load("textures/regions.png")),
-            }),
-            transform: Transform::from_xyz(0.7, 2.5, 0.6),
-            ..default()
-        })
-        .insert(RigidBody::Dynamic)
-        .insert(Collider::cuboid(0.5, 0.5, 0.5));
+    // commands
+    //     .spawn_bundle(MaterialMeshBundle {
+    //         mesh: meshes.add(Mesh::from(shape::UVSphere { radius: 1.0, sectors: 32, stacks: 16 })),
+    //         material: custom_materials.add(DitheredMaterial {
+    //             color_texture: Some(asset_server.load("textures/regions.png")),
+    //         }),
+    //         transform: Transform::from_xyz(3.0, 1.5, 1.0),
+    //         ..default()
+    //     })
+    //     .insert(RigidBody::Dynamic)
+    //     .insert(Collider::ball(1.0));
+    // commands
+    //     .spawn_bundle(MaterialMeshBundle {
+    //         mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+    //         material: custom_materials.add(DitheredMaterial {
+    //             color_texture: Some(asset_server.load("textures/regions.png")),
+    //         }),
+    //         transform: Transform::from_xyz(0.7, 2.5, 0.6),
+    //         ..default()
+    //     })
+    //     .insert(RigidBody::Dynamic)
+    //     .insert(Collider::cuboid(0.5, 0.5, 0.5));
 
     commands.spawn_bundle(PointLightBundle {
         point_light: PointLight {
