@@ -18,7 +18,10 @@ use bevy::{
         },
     },
 };
-// #[cfg(feature = "trace")]
+
+pub const FLAT_PASS: &str = "flat_pass";
+pub const NAME: &str = "flat_3d_graph";
+// pub const VIEW_ENTITY: &str = "view_entity";
 
 pub struct FlatPass3dNode {
     query: QueryState<

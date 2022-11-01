@@ -1,4 +1,5 @@
-mod graph;
+pub mod graph;
+use graph::{FlatPass3dNode, Flat3d};
 use bevy::{
     utils::{ tracing::error, HashMap, HashSet, },
     pbr::{
@@ -6,13 +7,19 @@ use bevy::{
     },
     app::Plugin,
     asset::{load_internal_asset, Handle, HandleUntyped, AssetEvent, Assets},
-    core_pipeline::core_3d::Opaque3d,
+    core_pipeline::core_3d::{
+        Opaque3d, graph::node::MAIN_PASS, graph::input::VIEW_ENTITY, MainPass3dNode,
+    },
     ecs::{prelude::*, reflect::ReflectComponent, entity::Entity, system::{lifetimeless::{Read, SQuery, SRes}, SystemParamItem}},
     reflect::{Reflect, TypeUuid, std_traits::ReflectDefault},
     render::{
         mesh::{Mesh, MeshVertexBufferLayout},
         render_asset::{RenderAssets, PrepareAssetLabel},
-        render_phase::{AddRenderCommand, DrawFunctions, RenderPhase, SetItemPipeline, EntityRenderCommand, RenderCommandResult, TrackedRenderPass},
+        render_phase::{
+            AddRenderCommand, DrawFunctions, RenderPhase, SetItemPipeline, EntityRenderCommand, RenderCommandResult, TrackedRenderPass,
+            sort_phase_system
+        },
+        render_graph::{RenderGraph, SlotInfo, SlotType},
         render_resource::*,
         prelude::Image,
         view::{ExtractedView, Msaa, VisibleEntities},
@@ -50,7 +57,11 @@ where
 
         if let Ok(render_app) = app.get_sub_app_mut(RenderApp) {
             render_app
-                .add_render_command::<Opaque3d, DrawWireframes<M>>()
+                .init_resource::<DrawFunctions<Flat3d>>()
+                // .add_system_to_stage(RenderStage::Extract, extract_core_3d_camera_phases)
+                // .add_system_to_stage(RenderStage::Prepare, prepare_core_3d_depth_textures)
+                .add_system_to_stage(RenderStage::PhaseSort, sort_phase_system::<Flat3d>)
+                .add_render_command::<Flat3d, DrawWireframes<M>>()
                 .init_resource::<WireframePipeline<M>>()
                 .init_resource::<ExtractedWireframes<M>>()
                 .init_resource::<PreparedWireframes<M>>()
@@ -58,6 +69,49 @@ where
                 .add_system_to_stage(RenderStage::Extract, extract_wireframes::<M>)
                 .add_system_to_stage(RenderStage::Prepare, prepare_materials::<M>.after(PrepareAssetLabel::PreAssetPrepare))
                 .add_system_to_stage(RenderStage::Queue, queue_wireframes::<M>);
+
+            let pass_node_3d = FlatPass3dNode::new(&mut render_app.world);
+            let mut graph = render_app.world.resource_mut::<RenderGraph>();
+
+            let mut draw_3d_graph = RenderGraph::default();
+            draw_3d_graph.add_node(graph::FLAT_PASS, pass_node_3d);
+            let input_node_id = draw_3d_graph.set_input(vec![SlotInfo::new(
+                VIEW_ENTITY,
+                SlotType::Entity,
+            )]);
+            draw_3d_graph
+                .add_slot_edge(
+                    input_node_id,
+                    VIEW_ENTITY,
+                    graph::FLAT_PASS,
+                    MainPass3dNode::IN_VIEW,
+                )
+                .unwrap();
+            graph.add_sub_graph(graph::NAME, draw_3d_graph);
+            
+
+            // let shadow_pass_node = ShadowPassNode::new(&mut render_app.world);
+            // render_app.add_render_command::<Shadow, DrawShadowMesh>();
+            // let mut graph = render_app.world.resource_mut::<RenderGraph>();
+            // let draw_3d_graph = graph
+            //     .get_sub_graph_mut(bevy_core_pipeline::core_3d::graph::NAME)
+            //     .unwrap();
+            // draw_3d_graph.add_node(draw_3d_graph::node::SHADOW_PASS, shadow_pass_node);
+            // draw_3d_graph
+            //     .add_node_edge(
+            //         draw_3d_graph::node::SHADOW_PASS,
+            //         bevy_core_pipeline::core_3d::graph::node::MAIN_PASS,
+            //     )
+            //     .unwrap();
+            // draw_3d_graph
+            //     .add_slot_edge(
+            //         draw_3d_graph.input_node().unwrap().id,
+            //         bevy_core_pipeline::core_3d::graph::input::VIEW_ENTITY,
+            //         draw_3d_graph::node::SHADOW_PASS,
+            //         ShadowPassNode::IN_VIEW,
+            //     )
+            //     .unwrap();
+            // }
         }
     }
 }
@@ -177,7 +231,7 @@ where
 
 #[allow(clippy::too_many_arguments)]
 fn queue_wireframes<M: Material>(
-    opaque_3d_draw_functions: Res<DrawFunctions<Opaque3d>>,
+    opaque_3d_draw_functions: Res<DrawFunctions<Flat3d>>,
     render_meshes: Res<RenderAssets<Mesh>>,
     wireframe_pipeline: Res<WireframePipeline<M>>,
     prepared_wireframes: Res<PreparedWireframes<M>>,
@@ -185,7 +239,7 @@ fn queue_wireframes<M: Material>(
     mut pipeline_cache: ResMut<PipelineCache>,
     msaa: Res<Msaa>,
     mut material_meshes: Query<(Entity, &Handle<Mesh>, &MeshUniform)>,
-    mut views: Query<(&ExtractedView, &VisibleEntities, &mut RenderPhase<Opaque3d>)>,
+    mut views: Query<(&ExtractedView, &VisibleEntities, &mut RenderPhase<Flat3d>)>,
 ) where
     M::Data: PartialEq + Eq + Hash + Clone,
 {
@@ -213,7 +267,7 @@ fn queue_wireframes<M: Material>(
                             return;
                         }
                     };
-                    opaque_phase.add(Opaque3d {
+                    opaque_phase.add(Flat3d {
                         entity,
                         pipeline: pipeline_id,
                         draw_function: draw_custom,

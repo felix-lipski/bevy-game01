@@ -12,6 +12,7 @@ use bevy::{
     render::{
         render_resource::{ SamplerDescriptor, FilterMode, },
         texture::ImageSettings,
+        camera::CameraRenderGraph,
     },
     // pbr::PbrPlugin,
 };
@@ -69,6 +70,10 @@ fn setup(
             parent
                 .spawn_bundle(Camera3dBundle {
                     transform: Transform::from_xyz(0.0, 1.0, 0.0),
+                    camera_render_graph: CameraRenderGraph::new(
+                        // bevy::core_pipeline::core_3d::graph::NAME
+                        wireframe::graph::NAME
+                        ),
                     ..default()
                 })
                 .insert(PlayerHead);
