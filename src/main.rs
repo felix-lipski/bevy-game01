@@ -1,9 +1,8 @@
 mod movement;
 use movement::{MovementPlugin, PlayerHead, PlayerBody};
 mod dithered;
-use dithered::{DitheredMaterial};
+use dithered::{DitheredMaterial, mod_scene};
 use bevy::{
-    pbr::wireframe::{WireframeConfig, WireframePlugin},
     prelude::*,
     render::{
         render_resource::{ SamplerDescriptor, FilterMode, },
@@ -26,8 +25,8 @@ fn main() {
     app.add_plugins_with(DefaultPlugins, |plugins| plugins.disable::<LogPlugin>());
     app.add_plugin(MaterialPlugin::<DitheredMaterial>::default());
     app.add_plugin(MovementPlugin);
-    app.add_plugin(WireframePlugin);
     app.add_plugin(RapierPhysicsPlugin::<NoUserData>::default());
+    app.add_system(mod_scene);
     app.add_startup_system(setup);
     app.run();
 
@@ -40,11 +39,8 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut custom_materials: ResMut<Assets<DitheredMaterial>>,
-    mut wireframe_config: ResMut<WireframeConfig>,
     asset_server: Res<AssetServer>,
 ) {
-    wireframe_config.global = true;
-
     commands
         .spawn_bundle(PbrBundle {
             transform: Transform::from_xyz(0.0, 1.0, 3.0),
