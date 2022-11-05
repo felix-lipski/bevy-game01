@@ -72,39 +72,39 @@ fn setup(
         .insert(RigidBody::Fixed)
         .insert(Collider::cuboid(20.0, 0.01, 20.0));
 
-    commands
-        .spawn_bundle(MaterialMeshBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: custom_materials.add(DitheredMaterial {
-                color_texture: Some(asset_server.load("textures/regions.png")),
-            }),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..default()
-        })
-        .insert(RigidBody::Dynamic)
-        .insert(Collider::cuboid(0.5, 0.5, 0.5));
-    commands
-        .spawn_bundle(MaterialMeshBundle {
-            mesh: meshes.add(Mesh::from(shape::UVSphere { radius: 1.0, sectors: 32, stacks: 16 })),
-            material: custom_materials.add(DitheredMaterial {
-                color_texture: Some(asset_server.load("textures/regions.png")),
-            }),
-            transform: Transform::from_xyz(3.0, 1.5, 1.0),
-            ..default()
-        })
-        .insert(RigidBody::Dynamic)
-        .insert(Collider::ball(1.0));
-    commands
-        .spawn_bundle(MaterialMeshBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: custom_materials.add(DitheredMaterial {
-                color_texture: Some(asset_server.load("textures/regions.png")),
-            }),
-            transform: Transform::from_xyz(0.7, 2.5, 0.6),
-            ..default()
-        })
-        .insert(RigidBody::Dynamic)
-        .insert(Collider::cuboid(0.5, 0.5, 0.5));
+    // commands
+    //     .spawn_bundle(MaterialMeshBundle {
+    //         mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+    //         material: custom_materials.add(DitheredMaterial {
+    //             color_texture: Some(asset_server.load("textures/regions.png")),
+    //         }),
+    //         transform: Transform::from_xyz(0.0, 0.5, 0.0),
+    //         ..default()
+    //     })
+    //     .insert(RigidBody::Dynamic)
+    //     .insert(Collider::cuboid(0.5, 0.5, 0.5));
+    // commands
+    //     .spawn_bundle(MaterialMeshBundle {
+    //         mesh: meshes.add(Mesh::from(shape::UVSphere { radius: 1.0, sectors: 32, stacks: 16 })),
+    //         material: custom_materials.add(DitheredMaterial {
+    //             color_texture: Some(asset_server.load("textures/regions.png")),
+    //         }),
+    //         transform: Transform::from_xyz(3.0, 1.5, 1.0),
+    //         ..default()
+    //     })
+    //     .insert(RigidBody::Dynamic)
+    //     .insert(Collider::ball(1.0));
+    // commands
+    //     .spawn_bundle(MaterialMeshBundle {
+    //         mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+    //         material: custom_materials.add(DitheredMaterial {
+    //             color_texture: Some(asset_server.load("textures/regions.png")),
+    //         }),
+    //         transform: Transform::from_xyz(0.7, 2.5, 0.6),
+    //         ..default()
+    //     })
+    //     .insert(RigidBody::Dynamic)
+    //     .insert(Collider::cuboid(0.5, 0.5, 0.5));
 
     commands.spawn_bundle(PointLightBundle {
         point_light: PointLight {
@@ -118,6 +118,21 @@ fn setup(
     commands.spawn_bundle(SceneBundle {
         scene: asset_server.load("models/skyscraper.glb#Scene0"),
         transform: Transform::from_xyz(-10.0, 0.0, -10.0),
+        ..Default::default()
+    });
+    commands.spawn_bundle(SceneBundle {
+        scene: asset_server.load("models/rock.glb#Scene0"),
+        transform: Transform::from_xyz(10.0, 0.0, -10.0),
+        ..Default::default()
+    });
+    commands.spawn_bundle(SceneBundle {
+        scene: asset_server.load("models/ball.glb#Scene0"),
+        transform: Transform::from_xyz(0.0, 1.5, 0.0),
+        ..Default::default()
+    });
+    commands.spawn_bundle(SceneBundle {
+        scene: asset_server.load("models/mech.glb#Scene0"),
+        transform: Transform::from_xyz(0.0, 0.0, -10.0),
         ..Default::default()
     });
 }
