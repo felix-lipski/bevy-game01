@@ -40,10 +40,10 @@ fn main() {
     app.add_plugin(WireframePlugin::<StandardMaterial>::default());
     app.add_plugin(RapierPhysicsPlugin::<NoUserData>::default());
     app.add_startup_system(setup);
-    app.run();
-
     let dot = bevy_mod_debugdump::get_render_graph(&mut app);
     std::fs::write("render-graph.dot", dot).expect("Failed to write render-graph.dot");
+    app.run();
+
 }
 
 fn setup(

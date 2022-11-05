@@ -45,5 +45,13 @@ digraph "RenderGraph" {
 		"_core_3d__core_3dGraphInputNode":"out-0:e" -> "_core_3d__core_3dui_pass":"in-0:w" ["color"="white"]
 	}
 	
+	subgraph "cluster_flat_3d_graph" {
+		"label"="flat_3d_graph";
+		graph ["style"="rounded,filled", "color"="#5e6570", "fontcolor"="black"];
+		"_flat_3d_graph__flat_3d_graphGraphInputNode" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">GraphInputNode<BR/><FONT COLOR="red" POINT-SIZE="10">GraphInputNode</FONT></TD></TR><TR><TD PORT="in-0">view_entity: Entity</TD><TD PORT="out-0">view_entity: Entity</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+		"_flat_3d_graph__flat_3d_graphflat_pass" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">flat_pass<BR/><FONT COLOR="red" POINT-SIZE="10">FlatPass3dNode</FONT></TD></TR><TR><TD PORT="in-0">view: Entity</TD><TD BORDER="0">&nbsp;</TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
+		"_flat_3d_graph__flat_3d_graphGraphInputNode":"out-0:e" -> "_flat_3d_graph__flat_3d_graphflat_pass":"in-0:w" ["color"="white"]
+	}
+	
 	"_camera_driver" ["label"=<<TABLE STYLE="rounded"><TR><TD PORT="title" BORDER="0" COLSPAN="2">camera_driver<BR/><FONT COLOR="red" POINT-SIZE="10">CameraDriverNode</FONT></TD></TR></TABLE>>, "color"="#99aab5", "fillcolor"="#99aab5"]
 }
