@@ -14,7 +14,8 @@ use bevy::log::LogPlugin;
 
 fn main() {
     let mut app = App::new();
-    app.insert_resource(ClearColor(Color::hsl(160.0, 0.0, 0.07)));
+    // app.insert_resource(ClearColor(Color::hex("121c2a").unwrap()));
+    app.insert_resource(ClearColor(Color::hex("f5f5df").unwrap()));
     app.insert_resource(Msaa { samples: 1 });
     app.insert_resource(ImageSettings { default_sampler: SamplerDescriptor {
             mag_filter: FilterMode::Nearest,
@@ -65,12 +66,12 @@ fn setup(
 
     commands
         .spawn_bundle(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Plane { size: 40.0 })),
+            // mesh: meshes.add(Mesh::from(shape::Plane { size: 60.0 })),
             material: materials.add(Color::hsl(77.0, 0.5, 0.66).into()),
             ..default()
         })
         .insert(RigidBody::Fixed)
-        .insert(Collider::cuboid(20.0, 0.01, 20.0));
+        .insert(Collider::cuboid(30.0, 0.01, 30.0));
 
     // commands
     //     .spawn_bundle(MaterialMeshBundle {
@@ -89,7 +90,7 @@ fn setup(
     //         material: custom_materials.add(DitheredMaterial {
     //             color_texture: Some(asset_server.load("textures/regions.png")),
     //         }),
-    //         transform: Transform::from_xyz(3.0, 1.5, 1.0),
+    //         transform: Transform::from_xyz(3.0, 1.5, 10.0),
     //         ..default()
     //     })
     //     .insert(RigidBody::Dynamic)
@@ -100,39 +101,44 @@ fn setup(
     //         material: custom_materials.add(DitheredMaterial {
     //             color_texture: Some(asset_server.load("textures/regions.png")),
     //         }),
-    //         transform: Transform::from_xyz(0.7, 2.5, 0.6),
+    //         transform: Transform::from_xyz(0.0, 2.5, 10.0),
     //         ..default()
     //     })
     //     .insert(RigidBody::Dynamic)
     //     .insert(Collider::cuboid(0.5, 0.5, 0.5));
 
-    commands.spawn_bundle(PointLightBundle {
-        point_light: PointLight {
-            intensity: 15000.0,
-            shadows_enabled: true,
-            ..default()
-        },
-        transform: Transform::from_xyz(0.0, 10.0, 0.0),
-        ..default()
-    });
+    // commands.spawn_bundle(PointLightBundle {
+    //     point_light: PointLight {
+    //         intensity: 15000.0,
+    //         shadows_enabled: true,
+    //         ..default()
+    //     },
+    //     transform: Transform::from_xyz(0.0, 10.0, 0.0),
+    //     ..default()
+    // });
+    // commands.spawn_bundle(SceneBundle {
+    //     scene: asset_server.load("models/skyscraper.glb#Scene0"),
+    //     transform: Transform::from_xyz(-10.0, 0.0, -10.0),
+    //     ..Default::default()
+    // });
+    // commands.spawn_bundle(SceneBundle {
+    //     scene: asset_server.load("models/rock.glb#Scene0"),
+    //     transform: Transform::from_xyz(10.0, 0.0, -10.0),
+    //     ..Default::default()
+    // });
     commands.spawn_bundle(SceneBundle {
-        scene: asset_server.load("models/skyscraper.glb#Scene0"),
-        transform: Transform::from_xyz(-10.0, 0.0, -10.0),
+        scene: asset_server.load("models/balls.glb#Scene0"),
+        transform: Transform::from_xyz(-10.0, 0.0, 0.0),
         ..Default::default()
     });
-    commands.spawn_bundle(SceneBundle {
-        scene: asset_server.load("models/rock.glb#Scene0"),
-        transform: Transform::from_xyz(10.0, 0.0, -10.0),
-        ..Default::default()
-    });
-    commands.spawn_bundle(SceneBundle {
-        scene: asset_server.load("models/ball.glb#Scene0"),
-        transform: Transform::from_xyz(0.0, 1.5, 0.0),
-        ..Default::default()
-    });
-    commands.spawn_bundle(SceneBundle {
-        scene: asset_server.load("models/mech.glb#Scene0"),
-        transform: Transform::from_xyz(0.0, 0.0, -10.0),
-        ..Default::default()
-    });
+    // commands.spawn_bundle(SceneBundle {
+    //     scene: asset_server.load("models/ball.glb#Scene0"),
+    //     transform: Transform::from_xyz(0.0, 1.5, 0.0),
+    //     ..Default::default()
+    // });
+    // commands.spawn_bundle(SceneBundle {
+    //     scene: asset_server.load("models/mech.glb#Scene0"),
+    //     transform: Transform::from_xyz(0.0, 0.0, -10.0),
+    //     ..Default::default()
+    // });
 }

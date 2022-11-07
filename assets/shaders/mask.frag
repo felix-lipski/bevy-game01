@@ -42,20 +42,35 @@ float s_to_linear (float thesRGBValue) {
 
 vec4 colDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
 
+/* vec3 alumi[3]    = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.28906, 0.44921, 0.65234),vec3(0.95703, 0.95703, 0.87109)); */
+/* vec3 steel[2]    = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.28906, 0.44921, 0.65234)); */
+/* vec3 tire[2]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.08984, 0.16796, 0.21093)); */
+/* vec3 wood[4]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.25390, 0.17187, 0.20703),vec3(0.44921, 0.25390, 0.23046),vec3(0.71093, 0.42968, 0.31250)); */
+/* vec3 grass[3]    = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.46484, 0.66406, 0000),vec3(0.79687, 0.73046, 0000)); */
+/* vec3 leaf[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.17187, 0.36718, 0.20703),vec3(0.46484, 0.66406, 0000)); */
+/* vec3 sand[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.44921, 0.25390, 0.23046),vec3(0.92968, 0.80078, 0.31250)); */
+/* vec3 sea[3]      = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.17187, 0.36718, 0.20703),vec3(0000, 0.66406, 0.46484)); */
+/* vec3 sky[3]      = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.06640, 0.25000, 0.51171),vec3(0000, 0.39843, 0.99609)); */
+/* vec3 warn[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.87500, 0.39453, 0000),vec3(0.95312, 0.70312, 0.10546)); */
+/* vec3 blood[3]    = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.79687, 0.13281, 0000),vec3(0.87500, 0.39453, 0000)); */
+/* vec3 clear[2]    = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.95703, 0.95703, 0.87109)); */
 
-vec3 alumi[4]    = vec3[](vec3(0.07031, 0.07031, 0.07031),vec3(0.48828, 0.43750, 0.44140),vec3(0.62500, 0.57421, 0.55468),vec3(0.87109, 0.96093, 0.95703));
-vec3 steel[4]    = vec3[](vec3(0.07031, 0.07031, 0.07031),vec3(0.18750, 0.17187, 0.17968),vec3(0.35156, 0.32421, 0.32421),vec3(0.48828, 0.43750, 0.44140));
-vec3 tire[4]     = vec3[](vec3(0.07031, 0.07031, 0.07031),vec3(0.18750, 0.17187, 0.17968),vec3(0.22265, 0.27734, 0.46875),vec3(0.35156, 0.32421, 0.32421));
-vec3 wood[4]     = vec3[](vec3(0.07031, 0.07031, 0.07031),vec3(0.62500, 0.35546, 0.32421),vec3(0.74609, 0.47265, 0.34375),vec3(0.92968, 0.62890, 0.37500));
-vec3 grass[4]    = vec3[](vec3(0.07031, 0.07031, 0.07031),vec3(0.22265, 0.48046, 0.26562),vec3(0.44140, 0.66406, 0.20312),vec3(0.71093, 0.83203, 0.23437));
-vec3 leaf[4]     = vec3[](vec3(0.07031, 0.07031, 0.07031),vec3(0.23437, 0.34765, 0.33593),vec3(0.22265, 0.48046, 0.26562),vec3(0.44140, 0.66406, 0.20312));
-vec3 sand[4]     = vec3[](vec3(0.07031, 0.07031, 0.07031),vec3(0.95312, 0.70312, 0.10546),vec3(0.92968, 0.62890, 0.37500),vec3(0.95312, 0.79687, 0.62890));
-vec3 sea[4]      = vec3[](vec3(0.07031, 0.07031, 0.07031),vec3(0.22265, 0.27734, 0.46875),vec3(0.15625, 0.79687, 0.87109),vec3(0.87109, 0.96093, 0.95703));
-vec3 sky[4]      = vec3[](vec3(0.07031, 0.07031, 0.07031),vec3(0.22265, 0.46875, 0.65625),vec3(0.15625, 0.79687, 0.87109),vec3(0.53906, 0.91796, 0.94140));
-vec3 warn[4]     = vec3[](vec3(0.07031, 0.07031, 0.07031),vec3(0.95312, 0.49218, 0.10546),vec3(0.95312, 0.49218, 0.10546),vec3(0.95312, 0.70312, 0.10546));
-vec3 blood[4]    = vec3[](vec3(0.07031, 0.07031, 0.07031),vec3(0.66015, 0.23046, 0.23046),vec3(0.89843, 0.28125, 0.17968),vec3(0.95312, 0.49218, 0.10546));
-vec3 clear[4]    = vec3[](vec3(0.07031, 0.07031, 0.07031),vec3(0.80859, 0.77343, 0.71875),vec3(0.87109, 0.96093, 0.95703),vec3(0.87109, 0.96093, 0.95703));
-
+vec3 alum[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.28906, 0.44921, 0.65234),vec3(0.95703, 0.95703, 0.87109));
+vec3 stel[2]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.28906, 0.44921, 0.65234));
+vec3 tire[2]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.08984, 0.16796, 0.21093));
+vec3 wood[4]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.25390, 0.17187, 0.20703),vec3(0.44921, 0.25390, 0.23046),vec3(0.71093, 0.42968, 0.31250));
+vec3 gras[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.46484, 0.66406, 0000),vec3(0.79687, 0.73046, 0000));
+vec3 leaf[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.17187, 0.36718, 0.20703),vec3(0.46484, 0.66406, 0000));
+vec3 sand[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.44921, 0.25390, 0.23046),vec3(0.92968, 0.80078, 0.31250));
+vec3 seaf[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.17187, 0.36718, 0.20703),vec3(0000, 0.66406, 0.46484));
+vec3 skyb[4]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.06640, 0.25000, 0.51171),vec3(0000, 0.39843, 0.99609),vec3(0.95703, 0.95703, 0.87109));
+vec3 mint[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0000, 0.66406, 0.46484),vec3(0.95703, 0.95703, 0.87109));
+vec3 warn[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.87500, 0.39453, 0000),vec3(0.95312, 0.70312, 0.10546));
+vec3 blod[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.79687, 0.13281, 0000),vec3(0.87500, 0.39453, 0000));
+vec3 cler[2]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.95703, 0.95703, 0.87109));
+vec3 pink[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.92968, 0.52343, 0.58203),vec3(0.98046, 0.73046, 0.67578));
+vec3 purp[3]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.48828, 0.17578, 0.62500),vec3(0.51562, 0.39453, 0.92187));
+vec3 craz[6]     = vec3[](vec3(0.07031, 0.10937, 0.16406),vec3(0.06640, 0.25000, 0.51171),vec3(0000, 0.39843, 0.99609),vec3(0000, 0.66406, 0.46484),vec3(0.46484, 0.66406, 0000),vec3(0.79687, 0.73046, 0000));
 
 float dither_mask(float limit, vec4 in_mono, float bands) {
 	float stepp = 1.0 / bands;
@@ -73,18 +88,23 @@ int dithered_palette_index(float limit, vec4 in_mono, float bands) {
     return int(floor(f * bands * 0.99));
 }
 
-vec3 alumi_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return alumi[idx] ; } 
-vec3 steel_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return steel[idx] ; } 
-vec3 tire_f   (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return tire[idx]  ; } 
-vec3 wood_f   (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return wood[idx]  ; } 
-vec3 grass_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return grass[idx] ; } 
-vec3 leaf_f   (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return leaf[idx]  ; } 
-vec3 sand_f   (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return sand[idx]  ; } 
-vec3 sea_f    (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return sea[idx]   ; } 
-vec3 sky_f    (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return sky[idx]   ; } 
-vec3 warn_f   (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return warn[idx]  ; } 
-vec3 blood_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return blood[idx] ; } 
-vec3 clear_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return clear[idx] ; } 
+vec3 alum_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 3); return alum[idx] ; } 
+vec3 stel_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 2); return stel[idx] ; } 
+vec3 tire_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 2); return tire[idx] ; } 
+vec3 wood_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 4); return wood[idx] ; } 
+vec3 gras_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 3); return gras[idx] ; } 
+vec3 leaf_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 3); return leaf[idx] ; } 
+vec3 sand_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 3); return sand[idx] ; } 
+vec3 seaf_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 3); return seaf[idx] ; } 
+vec3 skyb_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 3); return skyb[idx] ; } 
+vec3 mint_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 3); return mint[idx] ; } 
+vec3 warn_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 3); return warn[idx] ; } 
+vec3 blod_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 3); return blod[idx] ; } 
+vec3 cler_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 2); return cler[idx] ; } 
+
+vec3 pink_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 3); return pink[idx] ; } 
+vec3 purp_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 3); return purp[idx] ; } 
+vec3 craz_f  (float limit, vec4 in_mono) { int idx = dithered_palette_index(limit, in_mono, 6); return craz[idx] ; } 
 
 vec3 apply_material(vec4 in_mat, float limit, vec4 in_mono) {
     int red   = int(in_mat.r * 256.0);
@@ -99,28 +119,35 @@ vec3 apply_material(vec4 in_mat, float limit, vec4 in_mono) {
         } else if (green < 128) { // 60
             if (blue < 64) { // 20
                 return leaf_f(limit, in_mono);
+            } else if (blue < 128) { // 60
+                return seaf_f(limit, in_mono);
             } else { // E0
-                return sea_f(limit, in_mono);
+                return skyb_f(limit, in_mono);
             };
         } else if (green < 192) { // A0
             if (blue < 64) { // 20
             } else { // E0
-                return sky_f(limit, in_mono);
+            };
+        } else { // E0
+            if (blue < 64) { // 20
+                return craz_f(limit, in_mono);
             };
         };
     } else if (red < 128) { // 60
         if (green < 64) { // 20
             if (blue < 64) { // 20
                 return wood_f(limit, in_mono);
+            } else { // E0
+                return purp_f(limit, in_mono);
             };
         } else if (green < 128) { // 60
             if (blue < 64) { // 20
             } else if (blue < 128) { // 60
-                return steel_f(limit, in_mono);
+                return stel_f(limit, in_mono);
             };
         } else if (green < 192) { // A0
             if (blue < 64) { // 20
-                return grass_f(limit, in_mono);
+                return gras_f(limit, in_mono);
             };
         } else { // E0
             if (blue < 64) { // 20
@@ -134,20 +161,24 @@ vec3 apply_material(vec4 in_mat, float limit, vec4 in_mono) {
             if (blue < 64) { // 20
             };
         } else if (green < 192) { // A0
-            if (blue < 64) { // 20
-                return alumi_f(limit, in_mono);
+            if (blue < 192) { // A0
+                return alum_f(limit, in_mono);
             };
         } else { // E0
             if (blue < 64) { // 20
+            } else { // E0
+                return mint_f(limit, in_mono);
             };
         };
     } else { // E0
         if (green < 64) { // 20
             if (blue < 64) { // 20
-                return blood_f(limit, in_mono);
+                return blod_f(limit, in_mono);
             };
         } else if (green < 128) { // 60
             if (blue < 64) { // 20
+            } else { // E0
+                return pink_f(limit, in_mono);
             };
         } else if (green < 192) { // A0
             if (blue < 64) { // 20
@@ -158,11 +189,11 @@ vec3 apply_material(vec4 in_mat, float limit, vec4 in_mono) {
             if (blue < 192) {
                 return sand_f(limit, in_mono);
             } else { // E0
-                return clear_f(limit, in_mono);
+                return cler_f(limit, in_mono);
             };
         };
     };
-    return clear_f(limit, in_mono);
+    return cler_f(limit, in_mono);
 
 }
 
