@@ -126,11 +126,6 @@ fn setup(
     //     transform: Transform::from_xyz(10.0, 0.0, -10.0),
     //     ..Default::default()
     // });
-    commands.spawn_bundle(SceneBundle {
-        scene: asset_server.load("models/balls.glb#Scene0"),
-        transform: Transform::from_xyz(-10.0, 0.0, 0.0),
-        ..Default::default()
-    });
     // commands.spawn_bundle(SceneBundle {
     //     scene: asset_server.load("models/ball.glb#Scene0"),
     //     transform: Transform::from_xyz(0.0, 1.5, 0.0),
@@ -141,4 +136,14 @@ fn setup(
     //     transform: Transform::from_xyz(0.0, 0.0, -10.0),
     //     ..Default::default()
     // });
+    commands.spawn_bundle(SceneBundle {
+        scene: asset_server.load("models/balls.glb#Scene0"),
+        transform: Transform::from_xyz(-10.0, 0.0, 0.0),
+        ..Default::default()
+    });
+    commands.spawn_bundle(SceneBundle {
+        scene: asset_server.load("models/computer.glb#Scene0"),
+        transform: Transform::from_xyz(0.0, 0.0, 7.0),
+        ..Default::default()
+    });
 }

@@ -80,6 +80,9 @@ float dither_mask(float limit, vec4 in_mono, float bands) {
 	limit = limit/bands + a;
 	float _out = a;
 	if (bri > limit) { _out = b; };
+    /* if (bri > 0.999) { */
+    /*     return 1.0; */
+    /* } */
     return _out;
 }
 
